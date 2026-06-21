@@ -53,10 +53,15 @@ def run(limit: int) -> None:
 
 
 def main() -> None:
+    from app.db.database import close_pool
+
     p = argparse.ArgumentParser()
     p.add_argument("--limit", type=int, default=50)
     args = p.parse_args()
-    run(args.limit)
+    try:
+        run(args.limit)
+    finally:
+        close_pool()
 
 
 if __name__ == "__main__":

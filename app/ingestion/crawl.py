@@ -12,6 +12,7 @@ import logging
 
 from app.config import settings
 from app.db import repository as repo
+from app.db.database import close_pool
 from app.ingestion.cleaning import clean_batch
 from app.ingestion.telegram_client import TelegramReader
 
@@ -74,12 +75,15 @@ def main() -> None:
     p.add_argument("--print-session", action="store_true")
     args = p.parse_args()
 
-    if args.print_session:
-        asyncio.run(print_session())
-        return
-    if not args.keywords:
-        p.error("provide --keywords or --print-session")
-    asyncio.run(crawl(args.keywords))
+    try:
+        if args.print_session:
+            asyncio.run(print_session())
+            return
+        if not args.keywords:
+            p.error("provide --keywords or --print-session")
+        asyncio.run(crawl(args.keywords))
+    finally:
+        close_pool()
 
 
 if __name__ == "__main__":

@@ -12,6 +12,13 @@ from app.config import settings
 _pool: ConnectionPool | None = None
 
 
+def _configure(conn) -> None:
+    """Run once per new connection: fail fast on lock contention instead of
+    hanging until the server statement_timeout (which strands locks on crash)."""
+    conn.execute("SET lock_timeout = '5s'")
+    conn.execute("SET idle_in_transaction_session_timeout = '15s'")
+
+
 def get_pool() -> ConnectionPool:
     global _pool
     if _pool is None:
@@ -25,9 +32,19 @@ def get_pool() -> ConnectionPool:
             min_size=1,
             max_size=5,
             kwargs={"row_factory": dict_row, "prepare_threshold": None},
+            configure=_configure,
             open=True,
         )
     return _pool
+
+
+def close_pool() -> None:
+    """Close the pool cleanly. Call at process exit to avoid the noisy
+    'cannot join thread at interpreter shutdown' finalizer error."""
+    global _pool
+    if _pool is not None:
+        _pool.close()
+        _pool = None
 
 
 @contextmanager
