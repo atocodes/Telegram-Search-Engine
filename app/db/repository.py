@@ -1,9 +1,13 @@
 """All SQL lives here so worker / analysis / API share one source of truth."""
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from app.db.database import get_conn
+from app.search import meili
+
+log = logging.getLogger("repository")
 
 
 # ---------------------------------------------------------------- channels ---
@@ -142,8 +146,21 @@ def upsert_analysis(channel_id: int, data: dict[str, Any]) -> None:
 
 
 # ------------------------------------------------------------------ search ---
-def search_channels(query: str, limit: int = 20) -> list[dict[str, Any]]:
-    """Full-text search ranked by final_score blended with text relevance."""
+def _hydrate_by_ids(ids: list[int]) -> list[dict[str, Any]]:
+    """Fetch full channel_ranked rows for the given ids, preserving id order."""
+    if not ids:
+        return []
+    with get_conn() as conn:
+        rows = conn.execute(
+            "SELECT * FROM channel_ranked WHERE id = ANY(%s)", (ids,)
+        ).fetchall()
+    by_id = {r["id"]: r for r in rows}
+    # Preserve the order Meili returned (relevance order).
+    return [by_id[i] for i in ids if i in by_id]
+
+
+def _search_postgres(query: str, limit: int) -> list[dict[str, Any]]:
+    """Postgres FTS fallback: text relevance blended with final_score."""
     with get_conn() as conn:
         return conn.execute(
             """
@@ -159,6 +176,19 @@ def search_channels(query: str, limit: int = 20) -> list[dict[str, Any]]:
             """,
             {"q": query, "limit": limit},
         ).fetchall()
+
+
+def search_channels(query: str, limit: int = 20) -> list[dict[str, Any]]:
+    """Search via Meilisearch (typo-tolerant, ranked). If Meili is unavailable
+    or errors, transparently fall back to Postgres full-text search."""
+    hits = meili.search(query, limit=limit)
+    if hits is not None:
+        ids = [int(h["id"]) for h in hits if "id" in h]
+        rows = _hydrate_by_ids(ids)
+        if rows:
+            return rows
+        # Meili up but empty (e.g. not yet indexed) — try Postgres as a safety net.
+    return _search_postgres(query, limit)
 
 
 def get_channel(channel_id: int) -> dict[str, Any] | None:

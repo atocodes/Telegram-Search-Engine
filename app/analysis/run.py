@@ -11,6 +11,7 @@ import logging
 from app.analysis.analyzer import ChannelAnalyzer
 from app.analysis import scoring
 from app.db import repository as repo
+from app.search import meili
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger("analysis.run")
@@ -18,6 +19,7 @@ log = logging.getLogger("analysis.run")
 
 def run(limit: int) -> None:
     analyzer = ChannelAnalyzer()
+    meili.ensure_index()  # no-op if Meili isn't configured/reachable
     channels = repo.channels_needing_analysis(limit=limit)
     log.info("analyzing %d channels", len(channels))
 
@@ -46,6 +48,13 @@ def run(limit: int) -> None:
                 "final_score": final,
             },
         )
+
+        # Mirror the freshly-analyzed channel into Meilisearch. Non-fatal if
+        # Meili is down — Postgres remains the source of truth.
+        ranked = repo.get_channel(ch["id"])
+        if ranked:
+            meili.upsert([ranked])
+
         log.info(
             "  %s -> %s (score=%.1f conf=%.2f)",
             ch["title"], llm["category"], final, llm["confidence"],

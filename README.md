@@ -112,7 +112,36 @@ final_score = activity*0.30 + member*0.20 + quality*0.40 + freshness*0.10
 - **quality** — LLM usefulness (spam penalized, richer output scores higher)
 - **freshness** — recency of newest sampled message
 
-Search blends `final_score` (70%) with text relevance (30%).
+## Search (Meilisearch + Postgres fallback)
+
+Search runs through **Meilisearch** for typo-tolerance, word/proximity ranking,
+and speed. Postgres stays the source of truth; analyzed channels are mirrored
+into Meili automatically. **If Meili is unconfigured or down, search falls back
+to Postgres full-text search with no errors** — so the app always works.
+
+Meili ranking: text relevance first (`words → typo → proximity → exactness`),
+then `final_score` descending as the tie-breaker. The Postgres fallback blends
+`final_score` (70%) with text relevance (30%).
+
+### Running Meilisearch
+
+```bash
+# Docker (simplest)
+docker run -d --name meili -p 7700:7700 \
+  -e MEILI_MASTER_KEY=devkey getmeili/meilisearch:v1.10
+
+# then set MEILI_URL / MEILI_MASTER_KEY in .env
+```
+
+The analyzer auto-creates the index and syncs each channel as it's scored. To
+index channels that were analyzed **before** you stood up Meili, run a one-time
+bulk reindex from Postgres:
+
+```bash
+python -m app.search.reindex
+```
+
+To turn Meili off entirely, leave `MEILI_URL` blank — search uses Postgres.
 
 ## Continuous refresh (later)
 

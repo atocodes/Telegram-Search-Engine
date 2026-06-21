@@ -27,6 +27,12 @@ class Settings(BaseSettings):
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "llama3.1:8b"
 
+    # Meilisearch
+    # If meili_url is empty, search transparently falls back to Postgres FTS.
+    meili_url: str = "http://localhost:7700"
+    meili_master_key: str = ""
+    meili_index: str = "channels"
+
     # API
     api_host: str = "0.0.0.0"
     api_port: int = 8000
