@@ -1,0 +1,63 @@
+"""Analysis entrypoint: pull un-analyzed channels, run LLM + scoring, persist.
+
+Usage:
+    python -m app.analysis.run --limit 50
+"""
+from __future__ import annotations
+
+import argparse
+import logging
+
+from app.analysis.analyzer import ChannelAnalyzer
+from app.analysis import scoring
+from app.db import repository as repo
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+log = logging.getLogger("analysis.run")
+
+
+def run(limit: int) -> None:
+    analyzer = ChannelAnalyzer()
+    channels = repo.channels_needing_analysis(limit=limit)
+    log.info("analyzing %d channels", len(channels))
+
+    for ch in channels:
+        messages = repo.get_channel_messages(ch["id"], limit=50)
+        if not messages:
+            continue
+
+        llm = analyzer.analyze(ch["title"], messages)
+
+        activity = scoring.activity_score(messages)
+        member = scoring.member_score(ch.get("member_count"))
+        freshness = scoring.freshness_score(messages)
+        quality = llm.pop("quality_score")
+        final = scoring.final_score(
+            activity=activity, member=member, quality=quality, freshness=freshness
+        )
+
+        repo.upsert_analysis(
+            ch["id"],
+            {
+                **llm,
+                "activity_score": activity,
+                "quality_score": quality,
+                "freshness_score": freshness,
+                "final_score": final,
+            },
+        )
+        log.info(
+            "  %s -> %s (score=%.1f conf=%.2f)",
+            ch["title"], llm["category"], final, llm["confidence"],
+        )
+
+
+def main() -> None:
+    p = argparse.ArgumentParser()
+    p.add_argument("--limit", type=int, default=50)
+    args = p.parse_args()
+    run(args.limit)
+
+
+if __name__ == "__main__":
+    main()

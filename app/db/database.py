@@ -1,0 +1,35 @@
+"""Postgres connection pool shared across worker, analysis, and API."""
+from __future__ import annotations
+
+from contextlib import contextmanager
+from typing import Iterator
+
+from psycopg_pool import ConnectionPool
+from psycopg.rows import dict_row
+
+from app.config import settings
+
+_pool: ConnectionPool | None = None
+
+
+def get_pool() -> ConnectionPool:
+    global _pool
+    if _pool is None:
+        if not settings.database_url:
+            raise RuntimeError("DATABASE_URL is not set")
+        _pool = ConnectionPool(
+            settings.database_url,
+            min_size=1,
+            max_size=10,
+            kwargs={"row_factory": dict_row},
+            open=True,
+        )
+    return _pool
+
+
+@contextmanager
+def get_conn() -> Iterator:
+    """Yield a pooled connection; commits on success, rolls back on error."""
+    pool = get_pool()
+    with pool.connection() as conn:
+        yield conn
