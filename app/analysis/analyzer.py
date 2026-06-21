@@ -9,21 +9,39 @@ from app.analysis.ollama_client import OllamaClient
 log = logging.getLogger("analysis.analyzer")
 
 CATEGORIES = [
+    # marketplace / classifieds verticals
     "phones", "cars", "crypto", "jobs", "real_estate",
-    "electronics", "fashion", "news", "mixed", "spam",
+    "electronics", "fashion",
+    # tech / community verticals
+    "dev_community", "programming", "startup", "tech_news",
+    # general
+    "news", "mixed", "spam",
 ]
 
 _CLASSIFY_PROMPT = """You analyze Telegram channels. Given the channel title and a
-sample of recent messages, classify it. Respond ONLY with JSON of this exact shape:
+sample of recent messages, classify it accurately. Channels fall into many kinds:
+online marketplaces (phones, cars, electronics, fashion, real estate, jobs, crypto
+trading), and also non-commercial communities — developer/programming communities,
+indie hacker / startup channels, and tech-news channels. Do NOT assume a channel is
+a marketplace; many are communities where people share knowledge, not goods.
+
+Respond ONLY with JSON of this exact shape:
 {{
   "category": one of {categories},
   "is_marketplace": true or false,
   "confidence": number between 0 and 1,
   "summary": "one or two sentences on what this channel posts",
-  "tone": "marketplace" | "news" | "spam" | "educational",
+  "tone": "marketplace" | "news" | "community" | "educational" | "spam",
   "typical_content": "what users typically post here",
   "why_recommended": "a punchy 1-2 sentence reason a user would want this channel"
 }}
+
+Guidance:
+- dev_community: developers sharing code, projects, dev-life, building in public.
+- programming: tutorials, snippets, language/framework-specific learning content.
+- startup: founders, indie hackers, product launches, growth, fundraising.
+- tech_news: tech industry news, releases, announcements.
+- Set is_marketplace=true ONLY when people buy/sell goods or services there.
 
 Channel title: {title}
 

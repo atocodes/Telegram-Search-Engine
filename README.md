@@ -131,6 +131,20 @@ Already-known channels and bot/reserved usernames are filtered out, so the
 frontier only holds genuinely new, valid leads. Run it repeatedly — each pass
 goes wider.
 
+**Add a known channel by hand:**
+
+When you already know a channel (no search needed), seed it straight into the
+frontier; the next link-graph crawl resolves, samples, and expands from it:
+
+```bash
+python -m app.ingestion.add_channel https://t.me/SoloDevChronicles
+python -m app.ingestion.crawl --link-graph --max-depth 2 --limit 30
+```
+
+This is the best way to bootstrap a new vertical: one good seed channel snowballs
+into its neighborhood via the link graph. (Tech keywords + a SoloDevChronicles
+seed are included in `migrations/004_tech_vertical.sql`.)
+
 **Analyze (LLM + scoring):**
 
 ```bash

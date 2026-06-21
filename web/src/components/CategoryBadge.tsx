@@ -5,6 +5,10 @@ const TONE: Record<string, string> = {
   jobs: "border-accent/30 text-accent",
   phones: "border-warn/30 text-warn",
   spam: "border-danger/30 text-danger",
+  dev_community: "border-accent/30 text-accent",
+  programming: "border-info/30 text-info",
+  startup: "border-warn/30 text-warn",
+  tech_news: "border-info/30 text-info",
 };
 
 export function CategoryBadge({ category }: { category: string | null }) {
