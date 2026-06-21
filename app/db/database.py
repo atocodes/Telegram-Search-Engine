@@ -17,11 +17,14 @@ def get_pool() -> ConnectionPool:
     if _pool is None:
         if not settings.database_url:
             raise RuntimeError("DATABASE_URL is not set")
+        # prepare_threshold=None disables prepared statements, which is REQUIRED
+        # when connecting through Supabase's transaction pooler (port 6543).
+        # Pool kept small so a bad credential can't trip the auth circuit breaker.
         _pool = ConnectionPool(
             settings.database_url,
             min_size=1,
-            max_size=10,
-            kwargs={"row_factory": dict_row},
+            max_size=5,
+            kwargs={"row_factory": dict_row, "prepare_threshold": None},
             open=True,
         )
     return _pool
