@@ -17,10 +17,14 @@ def _configure(conn) -> None:
     hanging until the server statement_timeout (which strands locks on crash).
 
     The pool requires this callback to leave the connection OUT of a transaction,
-    so we run the SETs in autocommit and restore the default afterwards."""
+    so we run the SET in autocommit and restore the default afterwards.
+
+    NOTE: we deliberately do NOT set idle_in_transaction_session_timeout here.
+    The Supabase transaction pooler recycles idle connections on its own, and a
+    short server-side idle timeout caused pooled connections to be killed between
+    requests ('server closed the connection unexpectedly')."""
     conn.autocommit = True
     conn.execute("SET lock_timeout = '5s'")
-    conn.execute("SET idle_in_transaction_session_timeout = '15s'")
     conn.autocommit = False
 
 
@@ -32,12 +36,16 @@ def get_pool() -> ConnectionPool:
         # prepare_threshold=None disables prepared statements, which is REQUIRED
         # when connecting through Supabase's transaction pooler (port 6543).
         # Pool kept small so a bad credential can't trip the auth circuit breaker.
+        # check=check_connection verifies a pooled connection is still alive
+        # before handing it out, and transparently replaces dead ones. This is
+        # essential with the transaction pooler, which drops idle connections.
         _pool = ConnectionPool(
             settings.database_url,
             min_size=1,
             max_size=5,
             kwargs={"row_factory": dict_row, "prepare_threshold": None},
             configure=_configure,
+            check=ConnectionPool.check_connection,
             open=True,
         )
     return _pool
