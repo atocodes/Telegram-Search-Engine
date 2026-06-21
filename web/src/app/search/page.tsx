@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { SearchBar } from "@/components/SearchBar";
 import { ChannelCard } from "@/components/ChannelCard";
 import { EmptyState } from "@/components/EmptyState";
+import { NoResults } from "@/components/NoResults";
 import { searchChannels } from "@/lib/api";
 import type { ChannelSummary } from "@/lib/types";
 
@@ -25,12 +26,7 @@ async function Results({ q }: { q: string }) {
     );
   }
   if (channels.length === 0) {
-    return (
-      <EmptyState
-        title={`no channels matched "${q}"`}
-        hint="Try a broader term, or crawl more keywords into the index."
-      />
-    );
+    return <NoResults query={q} />;
   }
 
   return (

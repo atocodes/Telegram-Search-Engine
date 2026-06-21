@@ -79,8 +79,30 @@ python -m app.ingestion.crawl --print-session
 **Crawl (discover + sample):**
 
 ```bash
+# explicit keywords
 python -m app.ingestion.crawl --keywords phones addis market crypto jobs
 ```
+
+**Keyword expansion (DB-driven, recommended for growth):**
+
+Apply the keyword schema once (seeds English + Amharic terms):
+
+```bash
+psql "$DATABASE_URL" -f migrations/002_keywords.sql
+```
+
+Then let the crawler generate and crawl queries itself. It combines every
+enabled *base* term with same-language *modifiers* (cities, brands), picks the
+queries most overdue for a crawl, and records each run so repeat invocations
+explore new terms instead of re-crawling the same handful:
+
+```bash
+python -m app.ingestion.crawl --from-db --max-queries 20 --min-age-hours 24
+```
+
+Edit/extend the term sets in the `keyword_terms` table (kind = `base` or
+`modifier`, `lang` = `en`/`am`/…). More terms = wider coverage, all under the
+same throttle.
 
 **Analyze (LLM + scoring):**
 
