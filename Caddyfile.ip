@@ -1,0 +1,8 @@
+# HTTP-only config for testing WITHOUT a domain (serves on the server's IP).
+# Caddy listens on :80 and proxies to the frontend. No HTTPS (you need a
+# domain for that). Swap to the main Caddyfile once you have a domain.
+
+:80 {
+	encode gzip
+	reverse_proxy web:3000
+}

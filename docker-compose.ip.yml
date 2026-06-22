@@ -1,0 +1,12 @@
+# Override for IP-only testing (no domain / no HTTPS).
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.ip.yml --env-file .env.prod up -d --build
+#
+# This swaps Caddy to the HTTP-only Caddyfile.ip so it serves on the server IP.
+
+services:
+  caddy:
+    volumes:
+      - ./Caddyfile.ip:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
