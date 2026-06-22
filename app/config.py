@@ -36,6 +36,9 @@ class Settings(BaseSettings):
     # API
     api_host: str = "0.0.0.0"
     api_port: int = 8000
+    # Comma-separated allowed origins for CORS (the deployed frontend URL).
+    # Empty = allow all (fine for local dev). Set in production.
+    cors_origins: str = ""
 
 
 settings = Settings()

@@ -6,6 +6,7 @@ Run:
 from __future__ import annotations
 
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.schemas import (
     CategoryOut,
@@ -18,10 +19,28 @@ from app.api.schemas import (
     MessageOut,
     StatsOut,
 )
+from app.config import settings
 from app.db import repository as repo
 from app.db import analytics
 
-app = FastAPI(title="Telegram Discovery Engine", version="0.1.0")
+# This API is intentionally READ-ONLY: every route is a GET that only reads from
+# the database. There are no write/mutation endpoints. CORS is restricted to the
+# configured frontend origin(s) in production.
+app = FastAPI(
+    title="Telegram Search Engine (read-only demo API)",
+    version="0.1.0",
+    docs_url=None if settings.cors_origins else "/docs",  # hide docs in prod
+    redoc_url=None,
+)
+
+_origins = [o.strip() for o in settings.cors_origins.split(",") if o.strip()]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_origins or ["*"],  # "*" only when unset (local dev)
+    allow_credentials=False,
+    allow_methods=["GET"],            # read-only: no POST/PUT/DELETE
+    allow_headers=["*"],
+)
 
 
 @app.get("/health")

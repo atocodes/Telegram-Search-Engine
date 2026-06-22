@@ -1,0 +1,11 @@
+# Automatic HTTPS for your domain. Caddy fetches + renews Let's Encrypt certs.
+# Set DOMAIN in .env.prod (e.g. tgsearch.example.com).
+#
+# The FastAPI service is NOT exposed publicly — the Next.js server calls it
+# internally over the Docker network (FASTAPI_URL=http://api:8000). So Caddy
+# only needs to serve the frontend, which already proxies /api to FastAPI.
+
+{$DOMAIN} {
+	encode gzip
+	reverse_proxy web:3000
+}

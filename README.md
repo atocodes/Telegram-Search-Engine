@@ -1,4 +1,4 @@
-# Telegram Discovery Engine
+# Telegram Search Engine
 
 Discovers, analyzes, and ranks public Telegram channels by topic and usefulness.
 

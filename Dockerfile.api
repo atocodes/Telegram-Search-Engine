@@ -1,0 +1,17 @@
+# FastAPI (read-only demo API). Build context = repo root.
+FROM python:3.12-slim
+
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+
+WORKDIR /app
+
+# System deps for psycopg + scipy/networkx wheels are prebuilt; keep slim.
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app ./app
+
+EXPOSE 8000
+
+# Read-only API. Workers kept low; the DB pool is small by design.
+CMD ["uvicorn", "app.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]

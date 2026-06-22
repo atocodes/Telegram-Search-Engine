@@ -1,0 +1,69 @@
+# Full read-only demo stack for a single Hetzner VPS.
+#   - caddy : reverse proxy + automatic HTTPS (Let's Encrypt)
+#   - web   : Next.js frontend
+#   - api   : FastAPI read-only API
+#   - meili : Meilisearch
+# Database is external (Supabase) — not run here.
+#
+# Bring up:  docker compose --env-file .env.prod up -d --build
+
+services:
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      - DOMAIN=${DOMAIN}
+    depends_on:
+      - web
+      - api
+
+  web:
+    build:
+      context: ./web
+    restart: unless-stopped
+    environment:
+      # The browser calls /api (proxied by Caddy to the api service), so the
+      # frontend's server-side fetches target the internal api service.
+      - FASTAPI_URL=http://api:8000
+      - NEXT_PUBLIC_REPO_URL=${NEXT_PUBLIC_REPO_URL}
+    expose:
+      - "3000"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - MEILI_URL=http://meili:7700
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
+      - MEILI_INDEX=channels
+      - CORS_ORIGINS=${CORS_ORIGINS}
+    expose:
+      - "8000"
+    depends_on:
+      - meili
+
+  meili:
+    image: getmeili/meilisearch:v1.10
+    restart: unless-stopped
+    environment:
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
+      - MEILI_ENV=production
+    volumes:
+      - meili_data:/meili_data
+    expose:
+      - "7700"
+
+volumes:
+  caddy_data:
+  caddy_config:
+  meili_data:

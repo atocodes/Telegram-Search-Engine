@@ -8,7 +8,7 @@ export function TopBar() {
           ▚
         </span>
         <span className="font-mono text-sm font-semibold tracking-tight text-fg-bright">
-          channelscope
+          telegram search engine
           <span className="ml-0.5 inline-block h-3 w-1.5 translate-y-px bg-accent align-middle animate-blink" />
         </span>
       </Link>

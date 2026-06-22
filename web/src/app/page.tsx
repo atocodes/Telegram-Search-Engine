@@ -20,14 +20,14 @@ export default async function HomePage() {
   return (
     <div className="mx-auto max-w-3xl pt-10 sm:pt-20">
       <div className="mb-2 font-mono text-xs text-accent">
-        telegram discovery engine
+        telegram search engine · demo
       </div>
       <h1 className="text-3xl font-semibold leading-tight tracking-tight text-fg-bright sm:text-4xl">
         Find the channels that actually
         <br className="hidden sm:block" /> matter — ranked, not just listed.
       </h1>
       <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted">
-        Channelscope discovers public Telegram channels, reads what they post,
+        This engine discovers public Telegram channels, reads what they post,
         and ranks them by activity, quality, and freshness — with a plain-English
         reason for every recommendation.
       </p>

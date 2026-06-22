@@ -1,4 +1,4 @@
--- Telegram Discovery Engine — schema
+-- Telegram Search Engine — schema
 -- Run against your Supabase Postgres (psql or Supabase SQL editor).
 
 -- ---------------------------------------------------------------------------
