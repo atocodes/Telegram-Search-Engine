@@ -1,13 +1,19 @@
 import Link from "next/link";
+import Image from "next/image";
 import { StarButton } from "./StarButton";
 
 export function TopBar() {
   return (
     <header className="flex items-center justify-between border-b border-border py-4">
       <Link href="/" className="group flex items-center gap-2.5">
-        <span className="flex h-7 w-7 items-center justify-center rounded border border-accent/40 bg-accent/10 font-mono text-sm text-accent">
-          ▚
-        </span>
+        <Image
+          src="/logo.png"
+          alt="Telegram Search Engine"
+          width={28}
+          height={28}
+          priority
+          className="h-7 w-7 rounded object-contain"
+        />
         <span className="font-mono text-sm font-semibold tracking-tight text-fg-bright">
           telegram search engine
           <span className="ml-0.5 inline-block h-3 w-1.5 translate-y-px bg-accent align-middle animate-blink" />
