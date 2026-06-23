@@ -56,12 +56,19 @@ cp .env.example .env   # then fill in values
 
 1. **Telegram API creds** — get `api_id`/`api_hash` at https://my.telegram.org
    → API development tools. Put them in `.env` with the dedicated phone number.
-2. **Database** — create the schema on your Supabase Postgres:
+2. **Database** — the easiest path is the bundled Postgres. Bring up just the
+   database from the stack (it auto-applies every file in `migrations/` on first
+   start):
    ```bash
-   psql "$DATABASE_URL" -f migrations/001_init.sql
+   docker compose --env-file .env.prod up -d postgres
    ```
-   (Or paste the file into the Supabase SQL editor.) Use the connection-pooler
-   URI from Supabase → Project Settings → Database.
+   Your `.env` `DATABASE_URL` then points at it
+   (`postgresql://tgsearch:PASSWORD@localhost:5432/tgsearch`).
+
+   *Bringing your own Postgres instead?* Just run the migrations against it:
+   ```bash
+   for f in migrations/*.sql; do psql "$DATABASE_URL" -f "$f"; done
+   ```
 3. **Local LLM** — install Ollama and pull a model:
    ```bash
    ollama pull llama3.1:8b   # matches OLLAMA_MODEL in .env

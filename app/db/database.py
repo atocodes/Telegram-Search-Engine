@@ -28,26 +28,32 @@ def _configure(conn) -> None:
     conn.autocommit = False
 
 
+def _is_pgbouncer(url: str) -> bool:
+    """Heuristic: are we talking to a transaction pooler (Supabase pgbouncer)?
+    Those need prepared statements disabled; a direct Postgres does not."""
+    u = url.lower()
+    return "pooler.supabase.com" in u or "pgbouncer" in u or ":6543" in u
+
+
 def get_pool() -> ConnectionPool:
     global _pool
     if _pool is None:
         if not settings.database_url:
             raise RuntimeError("DATABASE_URL is not set")
-        # prepare_threshold=None disables prepared statements, which is REQUIRED
-        # when connecting through Supabase's transaction pooler (port 6543).
-        # Pool kept small so a bad credential can't trip the auth circuit breaker.
-        # check=check_connection verifies a pooled connection is still alive
-        # before handing it out, and transparently replaces dead ones. This is
-        # essential with the transaction pooler, which drops idle connections.
+        kwargs = {"row_factory": dict_row}
+        if _is_pgbouncer(settings.database_url):
+            # Transaction poolers (Supabase port 6543) can't use prepared
+            # statements — disable them. Harmless to omit for direct Postgres.
+            kwargs["prepare_threshold"] = None
+        # check_connection revives connections a pooler may have dropped; the
+        # longer timeout keeps a slow deep-history crawl from starving the pool.
         _pool = ConnectionPool(
             settings.database_url,
             min_size=1,
             max_size=5,
-            # Longer acquire timeout so a slow deep-history crawl can't starve
-            # the pool; check_connection revives connections the pooler dropped.
             timeout=60.0,
             max_idle=120.0,
-            kwargs={"row_factory": dict_row, "prepare_threshold": None},
+            kwargs=kwargs,
             configure=_configure,
             check=ConnectionPool.check_connection,
             open=True,

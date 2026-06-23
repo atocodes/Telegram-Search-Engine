@@ -1,10 +1,11 @@
-# Full read-only demo stack for a single Hetzner VPS.
-#   - caddy : reverse proxy + automatic HTTPS (Let's Encrypt)
-#   - web   : Next.js frontend
-#   - api   : FastAPI read-only API
-#   - meili : Meilisearch
-# Database is external (Supabase) — not run here.
+# Full self-contained stack for a single VPS.
+#   - caddy    : reverse proxy + automatic HTTPS (Let's Encrypt)
+#   - web      : Next.js frontend
+#   - api      : FastAPI read-only API
+#   - meili    : Meilisearch
+#   - postgres : the database (data lives in a named volume)
 #
+# Everything runs locally — no external database needed.
 # Bring up:  docker compose --env-file .env.prod up -d --build
 
 services:
@@ -29,8 +30,6 @@ services:
       context: ./web
     restart: unless-stopped
     environment:
-      # The browser calls /api (proxied by Caddy to the api service), so the
-      # frontend's server-side fetches target the internal api service.
       - FASTAPI_URL=http://api:8000
       - NEXT_PUBLIC_REPO_URL=${NEXT_PUBLIC_REPO_URL}
     expose:
@@ -42,7 +41,8 @@ services:
       dockerfile: Dockerfile.api
     restart: unless-stopped
     environment:
-      - DATABASE_URL=${DATABASE_URL}
+      # Internal connection to the postgres service (standard URL, no pooler).
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-tgsearch}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-tgsearch}
       - MEILI_URL=http://meili:7700
       - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
       - MEILI_INDEX=channels
@@ -50,7 +50,10 @@ services:
     expose:
       - "8000"
     depends_on:
-      - meili
+      postgres:
+        condition: service_healthy
+      meili:
+        condition: service_started
 
   meili:
     image: getmeili/meilisearch:v1.10
@@ -63,7 +66,30 @@ services:
     expose:
       - "7700"
 
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-tgsearch}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB:-tgsearch}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      # Migrations run automatically on a FRESH database (first init only).
+      # Files run in alphabetical order, so 001_, 002_, ... are applied in order.
+      - ./migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tgsearch} -d ${POSTGRES_DB:-tgsearch}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # Bind to localhost only so the crawl/analysis pipeline (run from the host
+    # or via SSH tunnel) can reach the DB, without exposing it to the internet.
+    ports:
+      - "127.0.0.1:5432:5432"
+
 volumes:
   caddy_data:
   caddy_config:
   meili_data:
+  pg_data:

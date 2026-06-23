@@ -1,13 +1,14 @@
 # Deploying the read-only demo on a Hetzner VPS
 
-This deploys the **public demo** (frontend + read-only API + Meilisearch) on a
-single small server, behind Caddy with automatic HTTPS. The **crawler + Ollama
-pipeline does NOT run here** — you run that locally on your own machine (it needs
-a residential IP and a GPU) and it writes into the same Supabase database the
-demo reads from.
+This deploys the **public demo** (frontend + read-only API + Meilisearch +
+Postgres) on a single small server, behind Caddy with automatic HTTPS. The whole
+stack — database included — runs in Docker; nothing external is required. The
+**crawler + Ollama pipeline does NOT run here** — you run that locally on your
+own machine (it needs a residential IP and a GPU) and it writes into the server's
+Postgres (over an SSH tunnel) the demo reads from.
 
 ```
-Internet ──► Caddy (HTTPS) ──► web (Next.js) ──► api (FastAPI) ──► Supabase
+Internet ──► Caddy (HTTPS) ──► web (Next.js) ──► api (FastAPI) ──► postgres
                                                        └────────► meili
 ```
 
@@ -53,32 +54,33 @@ docker compose --env-file .env.prod up -d --build
 Caddy will fetch HTTPS certs automatically (give it ~30s on first run). Visit
 `https://your-domain` — the site should load.
 
-## 6. Apply migrations (once)
+## 6. Database
 
-Run the SQL migrations against your Supabase DB (from your laptop or the server):
+The dockerized Postgres applies every file in `migrations/` automatically on its
+first start — so a fresh deploy needs **no manual migration step**.
 
-```bash
-for f in migrations/*.sql; do
-  psql "$DATABASE_URL" -f "$f"
-done
-```
+**Moving existing data** (e.g. from a previous Supabase setup)? Follow
+`MIGRATE_DB.md` to dump and restore it into the container.
 
 ## 7. Seed the search index (once)
 
-Meilisearch starts empty. Populate it from the data already in Supabase:
+Meilisearch starts empty. Populate it from the data in Postgres:
 
 ```bash
 docker compose --env-file .env.prod exec api python -m app.search.reindex
 ```
 
-(If you skip this, search still works via the Postgres fallback.)
+(If you skip this, search still works via the Postgres full-text fallback.)
 
 ## 8. Done
 
 The demo is live and read-only. To refresh the data later, run the pipeline on
-your **local machine** (crawl → analyze → metrics), which updates Supabase; the
-demo reflects it immediately. Re-run `reindex` after big data changes so Meili
-stays in sync.
+your **local machine** (crawl → analyze → metrics) pointed at the server's
+Postgres over an SSH tunnel (see `MIGRATE_DB.md`); the demo reflects it
+immediately. Re-run `reindex` after big data changes so Meili stays in sync.
+
+**Back up the database** — you now own it. See `MIGRATE_DB.md` for the
+`scripts/backup.sh` cron setup.
 
 ## Updating the deployment
 
@@ -89,13 +91,14 @@ docker compose --env-file .env.prod up -d --build
 
 ## Reusing this for future projects
 
-This pattern (Caddy + compose + Supabase) is a clean default for any small
-project: drop in a new `docker-compose.yml` with your services, point a domain,
-`compose up`. One Hetzner box can host several projects — give each its own
-domain block in the Caddyfile and its own compose project name
-(`docker compose -p projectname ...`).
+This pattern (Caddy + compose + bundled Postgres) is a clean default for any
+small project: drop in a new `docker-compose.yml` with your services, point a
+domain, `compose up`. One Hetzner box can host several projects — see
+`server-infra/README.md` for the shared-reverse-proxy setup that routes multiple
+domains on one server.
 
 ## Cost
 
-A CX22 is ~€4–5/mo and can host this demo plus several future projects. Supabase
-free tier covers the database. No per-service billing — it's a flat box.
+A CX22 is ~€4–5/mo and can host this demo plus several future projects.
+Everything (including the database) runs on the box — no external services, no
+per-service billing. It's a flat box.
