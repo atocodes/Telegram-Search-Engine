@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { GraphCanvas } from "./GraphCanvas";
 import { CategoryBadge } from "./CategoryBadge";
@@ -40,7 +40,11 @@ export function GraphView({
   bridges: HubOut[];
   clusters: ClusterOut[];
 }) {
-  const [panel, setPanel] = useState(true);
+  // Open by default on desktop, closed on mobile (the drawer covers the screen).
+  const [panel, setPanel] = useState(false);
+  useEffect(() => {
+    setPanel(window.matchMedia("(min-width: 640px)").matches);
+  }, []);
 
   return (
     <>
@@ -50,13 +54,13 @@ export function GraphView({
       {/* Floating metrics drawer */}
       <button
         onClick={() => setPanel((p) => !p)}
-        className="fixed right-4 top-[70px] z-20 rounded border border-border bg-surface/90 px-3 py-1.5 font-mono text-xs text-muted backdrop-blur hover:border-accent/40 hover:text-accent"
+        className="fixed right-3 top-[70px] z-30 rounded border border-border bg-surface/90 px-3 py-1.5 font-mono text-xs text-muted backdrop-blur hover:border-accent/40 hover:text-accent sm:right-4"
       >
-        {panel ? "hide metrics →" : "← metrics"}
+        {panel ? "hide metrics" : "metrics"}
       </button>
 
       {panel && (
-        <div className="fixed right-4 top-[112px] bottom-4 z-10 w-80 space-y-3 overflow-y-auto rounded-lg border border-border bg-surface/95 p-4 backdrop-blur">
+        <div className="fixed inset-x-3 bottom-3 top-[112px] z-20 space-y-3 overflow-y-auto rounded-lg border border-border bg-surface/95 p-4 backdrop-blur sm:inset-x-auto sm:right-4 sm:w-80">
           <div>
             <div className="mono-label mb-2">top hubs · influence</div>
             <div className="space-y-0.5">

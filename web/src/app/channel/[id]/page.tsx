@@ -42,8 +42,8 @@ export default async function ChannelPage({
       </Link>
 
       {/* Header */}
-      <div className="mt-4 panel p-6">
-        <div className="flex items-start gap-5">
+      <div className="mt-4 panel p-4 sm:p-6">
+        <div className="flex items-start gap-3 sm:gap-5">
           <Avatar username={channel.username} title={channel.title} size={64} />
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
@@ -90,7 +90,7 @@ export default async function ChannelPage({
       </div>
 
       {/* Score breakdown — final = quality·40 + activity·30 + influence·20 + freshness·10 */}
-      <div className="mt-4 grid gap-4 sm:grid-cols-5">
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-5">
         <Stat
           label="final score"
           value={Math.round(channel.final_score ?? 0)}
