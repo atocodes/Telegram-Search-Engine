@@ -9,14 +9,14 @@ export function TopBar() {
         <Image
           src="/logo.png"
           alt="Telegram Search Engine"
-          width={28}
-          height={28}
+          width={44}
+          height={44}
           priority
-          className="h-7 w-7 rounded object-contain"
+          className="h-11 w-11 rounded object-contain"
         />
-        <span className="font-mono text-sm font-semibold tracking-tight text-fg-bright">
+        <span className="font-mono text-base font-semibold tracking-tight text-fg-bright">
           telegram search engine
-          <span className="ml-0.5 inline-block h-3 w-1.5 translate-y-px bg-accent align-middle animate-blink" />
+          <span className="ml-0.5 inline-block h-3.5 w-1.5 translate-y-px bg-accent align-middle animate-blink" />
         </span>
       </Link>
       <nav className="flex items-center gap-1 font-mono text-xs">

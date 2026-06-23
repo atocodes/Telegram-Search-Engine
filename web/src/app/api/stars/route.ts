@@ -20,7 +20,12 @@ export async function GET() {
   }
   try {
     const res = await fetch(`https://api.github.com/repos/${slug}`, {
-      headers: { Accept: "application/vnd.github+json" },
+      headers: {
+        Accept: "application/vnd.github+json",
+        // GitHub's API rejects requests without a User-Agent (403).
+        "User-Agent": "telegram-search-engine-demo",
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
       next: { revalidate: 600 },
     });
     if (!res.ok) return NextResponse.json({ stars: null });
