@@ -9,14 +9,15 @@
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
-  /* Warm, muted palette */
   --bg-primary: #121016;
+  --bg-secondary: #18161c;
   --bg-surface: #1d1a24;
   --text-primary: #e8e4ee;
   --text-muted: #9f95b4;
   --accent: #c9a87c;
   --accent-dim: rgba(201, 168, 124, 0.25);
   --border-subtle: rgba(255, 255, 255, 0.06);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.55);
 }
 
 html,
