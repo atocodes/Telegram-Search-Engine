@@ -2,7 +2,7 @@
 
 Discovers, analyzes, and brings under-the-radar, hidden-gem Telegram channels into the spotlight. 
 
-Project Tugs is a fork of Solo Codes’ brilliant Telegram Search Engine. While the original platform naturally surfaces massive, already famous channels, **Project Tugs is built by underground creators, completely for underground creators.** We modified the core pipeline, scoring architectures, and discovery mechanics to ensure the creators grinding in quiet finally get seen, honored, and supported.
+Project Tugs is a fork of [Solo Codes](https://github.com/Brooksolomon)’ brilliant Telegram Search Engine. While the original platform naturally surfaces massive, already famous channels, **Project Tugs is built by underground creators, completely for underground creators.** We modified the core pipeline, scoring architectures, and discovery mechanics to ensure the creators grinding in quiet finally get seen, honored, and supported.
 
 Pipeline: **discover** (keyword & frontier expansion) → **sample** (recent messages, no join) → **analyze** (local LLM classification + underground potential scoring) → **search/rank** (Postgres FTS + custom creator-equity ranking blend) → **serve** (FastAPI).
 
