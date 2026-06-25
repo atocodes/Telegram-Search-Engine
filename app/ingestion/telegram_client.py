@@ -43,7 +43,8 @@ class TelegramReader:
                 "read-only by design. Set TG_ALLOW_JOIN=false."
             )
         session = StringSession(settings.tg_session_string or None)
-        self.client = TelegramClient(session, settings.tg_api_id, settings.tg_api_hash)
+        self.client = TelegramClient(
+            session, settings.tg_api_id, settings.tg_api_hash)
         self.throttle = Throttle(
             settings.tg_min_delay_seconds, settings.tg_jitter_seconds
         )
@@ -51,7 +52,8 @@ class TelegramReader:
     async def start(self) -> None:
         await self.client.start(phone=settings.tg_phone)
         me = await self.client.get_me()
-        log.info("Logged in as %s (id=%s)", getattr(me, "username", "?"), me.id)
+        log.info("Logged in as %s (id=%s)",
+                 getattr(me, "username", "?"), me.id)
 
     async def stop(self) -> None:
         await self.client.disconnect()
@@ -67,7 +69,8 @@ class TelegramReader:
             return await coro
         except FloodWaitError as e:
             wait = int(e.seconds) + 1
-            log.warning("FloodWait: sleeping %ss as instructed by Telegram", wait)
+            log.warning(
+                "FloodWait: sleeping %ss as instructed by Telegram", wait)
             await asyncio.sleep(wait)
             await self.throttle.wait()
             return await coro  # single retry after honoring the wait
@@ -77,7 +80,8 @@ class TelegramReader:
         """Global public search by keyword. Returns channel dicts (no join)."""
         try:
             res = await self._call(
-                self.client(functions.contacts.SearchRequest(q=keyword, limit=limit))
+                self.client(functions.contacts.SearchRequest(
+                    q=keyword, limit=limit))
             )
         except RPCError as e:
             log.error("search failed for %r: %s", keyword, e)
@@ -88,6 +92,12 @@ class TelegramReader:
             # Only broadcast channels / megagroups, skip users & basic groups.
             if not getattr(chat, "broadcast", False) and not getattr(chat, "megagroup", False):
                 continue
+            if (
+                not getattr(chat, "broadcast", False)
+                or getattr(chat, "participants_count", 0) >= 2000
+            ):
+                continue
+            participants_count = getattr(chat, "participants_count")
             channels.append(
                 {
                     "tg_id": chat.id,

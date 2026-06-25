@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import logging
+from ollama import Client as ollamaClient
 
 import httpx
 
@@ -16,29 +17,32 @@ class OllamaClient:
         self.base_url = settings.ollama_base_url.rstrip("/")
         self.model = settings.ollama_model
 
-    def generate_json(self, prompt: str, *, timeout: float = 120.0) -> dict:
+    def generate_json(self, prompt: str, *, timeout: float = 300.0) -> dict:
         """Call Ollama with format=json and parse the response into a dict."""
         try:
-            resp = httpx.post(
-                f"{self.base_url}/api/generate",
-                json={
-                    "model": self.model,
-                    "prompt": prompt,
-                    "stream": False,
-                    "format": "json",
-                    "options": {"temperature": 0.2},
-                },
-                timeout=timeout,
+            client = ollamaClient(
+                host=f"{self.base_url}/",
+                headers={
+                    "Authorization": f"Bearer {settings.ollama_api_key}"
+                }
+
             )
-            resp.raise_for_status()
+
+            messages = [
+                {
+                    'role': 'system',
+                    'content': prompt
+                },
+            ]
+
+            res = client.chat('gpt-oss:120b', messages=messages, stream=False)
+            resp = res['message']['content']
         except httpx.HTTPError as e:
             log.error("Ollama request failed: %s", e)
             return {}
 
-        body = resp.json()
-        raw = body.get("response", "").strip()
         try:
-            return json.loads(raw)
+            return json.loads(resp)
         except json.JSONDecodeError:
-            log.warning("Ollama returned non-JSON: %.200s", raw)
+            log.warning("Ollama returned non-JSON: %.200s", resp)
             return {}

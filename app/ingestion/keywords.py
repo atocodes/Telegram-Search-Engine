@@ -59,10 +59,16 @@ def due_queries(queries: list[str], *, min_age_hours: float, limit: int) -> list
         return []
     with get_conn() as conn:
         # Make sure every candidate query has a tracking row.
-        conn.executemany(
-            "INSERT INTO keyword_runs (query) VALUES (%s) ON CONFLICT (query) DO NOTHING",
-            [(q,) for q in queries],
-        )
+
+        for q in queries:
+            conn.execute(
+                "INSERT INTO keyword_runs (query) VALUES (%s) ON CONFLICT (query) DO NOTHING",
+                (q,)
+            )
+        # conn.executemany(
+        #     "INSERT INTO keyword_runs (query) VALUES (%s) ON CONFLICT (query) DO NOTHING",
+        #     [(q,) for q in queries],
+        # )
         rows = conn.execute(
             """
             SELECT query
