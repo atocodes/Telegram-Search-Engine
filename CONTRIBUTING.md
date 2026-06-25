@@ -1,4 +1,4 @@
-# Contributing to Telegram Search Engine
+# Contributing to The Under-grounders
 
 Thanks for your interest! This project is a self-hosted Telegram discovery,
 analysis, and graph engine. Contributions of all kinds are welcome — bug fixes,

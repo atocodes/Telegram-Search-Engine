@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 const REPO_URL =
-  process.env.NEXT_PUBLIC_REPO_URL ?? "https://github.com/your/tg-discovery";
+  process.env.NEXT_PUBLIC_REPO_URL ?? "https://github.com/atocodes/Telegram-Search-Engine";
 
 function StarIcon({ filled }: { filled: boolean }) {
   return (

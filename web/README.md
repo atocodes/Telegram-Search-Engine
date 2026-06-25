@@ -1,4 +1,4 @@
-# Telegram Search Engine — Web Frontend (Demo)
+# The Under-grounders — Web Frontend (Demo)
 
 Next.js 14 (App Router, TypeScript, Tailwind) frontend for the Telegram
 Discovery Engine. Dark terminal / data-tool aesthetic.

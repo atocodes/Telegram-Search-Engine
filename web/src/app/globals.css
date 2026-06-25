@@ -6,8 +6,6 @@
 
 :root {
   color-scheme: dark;
-  /* Loaded via the @import above; system fonts fall back automatically
-     (see tailwind.config.ts fontFamily) if the network is unavailable. */
   --font-sans: "Inter";
   --font-mono: "JetBrains Mono";
 }
@@ -48,12 +46,17 @@ body {
 
 @layer components {
   .panel {
-    @apply rounded-lg border border-border bg-surface/80 backdrop-blur-sm;
+    /* Use valid Tailwind syntax or extract the opacity into standard CSS variables */
+    @apply rounded-lg border border-border backdrop-blur-sm;
+    background-color: rgb(var(--surface) / 0.8); /* Native CSS alternative */
   }
   .mono-label {
     @apply font-mono text-[11px] uppercase tracking-[0.18em] text-muted;
   }
   .focus-ring {
-    @apply outline-none ring-1 ring-transparent focus-visible:ring-accent/60;
+    @apply outline-none ring-1 ring-transparent;
+  }
+  .focus-ring:focus-visible {
+    box-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) rgb(var(--accent) / 0.6);
   }
 }

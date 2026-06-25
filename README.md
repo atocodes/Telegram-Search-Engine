@@ -1,4 +1,4 @@
-# Telegram Search Engine
+# The Under-grounders
 
 Discovers, analyzes, and ranks public Telegram channels by topic and usefulness.
 

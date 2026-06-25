@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 const REPO =
-  process.env.NEXT_PUBLIC_REPO_URL ?? "https://github.com/your/telegram-search-engine";
+  process.env.NEXT_PUBLIC_REPO_URL ?? "https://github.com/atocodes/Telegram-Search-Engine";
 
 const SECTIONS = [
   { id: "overview", label: "Overview" },
@@ -19,7 +19,7 @@ const SECTIONS = [
 
 function Code({ children }: { children: string }) {
   return (
-    <pre className="overflow-x-auto rounded-md border border-border bg-surface p-3 font-mono text-[12px] leading-relaxed text-fg">
+    <pre className="overflow-x-auto rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl p-3 font-mono text-[12px] leading-relaxed text-white/80">
       <code>{children}</code>
     </pre>
   );
@@ -35,11 +35,16 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-24 border-t border-border pt-8 first:border-0 first:pt-0">
-      <h2 className="mb-3 font-mono text-lg font-semibold text-fg-bright">
-        <span className="text-accent">#</span> {title}
+    <section
+      id={id}
+      className="scroll-mt-24 border-t border-white/10 pt-8 first:border-0 first:pt-0"
+    >
+      <h2 className="mb-3 font-mono text-lg font-semibold text-white">
+        <span className="text-indigo-300">#</span> {title}
       </h2>
-      <div className="space-y-3 text-sm leading-relaxed text-fg">{children}</div>
+      <div className="space-y-3 text-sm leading-relaxed text-white/80">
+        {children}
+      </div>
     </section>
   );
 }
@@ -65,15 +70,20 @@ export function DocsContent() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <div className="mb-1 font-mono text-xs text-accent">documentation</div>
-      <h1 className="text-2xl font-semibold tracking-tight text-fg-bright">
+      <div className="mb-1 font-mono text-xs text-indigo-300">documentation</div>
+      <h1 className="text-2xl font-semibold tracking-tight text-white">
         How it works
       </h1>
-      <p className="mt-2 max-w-2xl text-sm text-muted">
-        Telegram Search Engine discovers, analyzes, ranks, and maps public
+      <p className="mt-2 max-w-2xl text-sm text-white/40">
+        The Under-grounders discovers, analyzes, ranks, and maps public
         Telegram channels. This page covers the design; the full reference lives
         in the{" "}
-        <a href={REPO} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
+        <a
+          href={REPO}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-indigo-300 hover:underline"
+        >
           repo
         </a>
         .
@@ -87,10 +97,10 @@ export function DocsContent() {
               <a
                 key={s.id}
                 href={`#${s.id}`}
-                className={`rounded px-2.5 py-1.5 font-mono text-xs transition-colors ${
+                className={`rounded-lg px-2.5 py-1.5 font-mono text-xs transition-colors ${
                   active === s.id
-                    ? "bg-surface-2 text-accent"
-                    : "text-muted hover:text-fg-bright"
+                    ? "bg-white/10 text-indigo-300"
+                    : "text-white/40 hover:text-white/80"
                 }`}
               >
                 {s.label}
@@ -104,7 +114,7 @@ export function DocsContent() {
           <Section id="overview" title="Overview">
             <p>
               Most Telegram tools are dumb scrapers. This one{" "}
-              <strong className="text-fg-bright">understands and maps</strong>{" "}
+              <strong className="text-white">understands and maps</strong>{" "}
               communities: it discovers channels, reads what they post, classifies
               and summarizes them with a local LLM, ranks them by usefulness and
               network influence, and builds an interactive graph of how they
@@ -112,28 +122,28 @@ export function DocsContent() {
             </p>
             <p>
               It&apos;s open source and self-hosted — one{" "}
-              <code className="rounded bg-surface px-1 font-mono text-[12px] text-accent">
+              <code className="rounded-md bg-white/10 px-1 font-mono text-[12px] text-indigo-300">
                 docker compose up
               </code>{" "}
               runs the whole stack. Use it as a data layer for any app that needs
               structured Telegram data, or run the web UI as a discovery product.
             </p>
-            <p className="text-muted">
-              This live site is a read-only demo over a frozen snapshot of
+            <p className="text-white/40">
+              This live site is a read-only over a frozen snapshot of
               tech-community channels.
             </p>
           </Section>
 
           <Section id="architecture" title="Architecture">
             <p>Two deliberately separated halves:</p>
-            <ul className="ml-4 list-disc space-y-1 text-muted marker:text-accent">
+            <ul className="ml-4 list-disc space-y-1 text-white/40 marker:text-indigo-300">
               <li>
-                <strong className="text-fg">The pipeline</strong> (crawl →
+                <strong className="text-white/80">The pipeline</strong> (crawl →
                 analyze → graph) runs on your own machine — it needs a residential
                 IP and a GPU for the local LLM. It writes to Postgres.
               </li>
               <li>
-                <strong className="text-fg">The serving layer</strong> (web +
+                <strong className="text-white/80">The serving layer</strong> (web +
                 read-only API + search) runs anywhere via Docker and only reads
                 the database.
               </li>
@@ -148,14 +158,16 @@ graph     (networkx) ─┘        └─────► Meilisearch ───�
               The pipeline is a set of CLI commands run on your machine against
               your own Telegram account.
             </p>
-            <p className="font-mono text-xs text-muted">discover + sample</p>
+            <p className="font-mono text-xs text-white/40">discover + sample</p>
             <Code>{`# keyword discovery (with DB-driven expansion)
 python -m app.ingestion.crawl --from-db --max-queries 20
 
 # seed a known channel, then snowball via the link graph
 python -m app.ingestion.add_channel https://t.me/SomeChannel
 python -m app.ingestion.crawl --link-graph --max-depth 2 --limit 30`}</Code>
-            <p className="font-mono text-xs text-muted">analyze + rank + index</p>
+            <p className="font-mono text-xs text-white/40">
+              analyze + rank + index
+            </p>
             <Code>{`python -m app.analysis.run --limit 200   # LLM classify + score
 python -m app.graph.metrics              # pagerank, clusters, rescore
 python -m app.search.reindex             # sync into Meilisearch`}</Code>
@@ -163,13 +175,13 @@ python -m app.search.reindex             # sync into Meilisearch`}</Code>
 
           <Section id="search" title="Search">
             <p>
-              Search runs through <strong className="text-fg-bright">Meilisearch</strong>{" "}
+              Search runs through <strong className="text-white">Meilisearch</strong>{" "}
               — typo-tolerant, with word and proximity ranking over each
               channel&apos;s title, handle, summary, and category. Results are
               ranked by text relevance first, then by the channel&apos;s quality
               score.
             </p>
-            <p className="text-muted">
+            <p className="text-white/40">
               If Meilisearch is unavailable, search transparently falls back to
               Postgres full-text search, so it never breaks.
             </p>
@@ -181,25 +193,41 @@ python -m app.search.reindex             # sync into Meilisearch`}</Code>
               forwarded-from channels — becomes a weighted edge. From that graph
               we compute, per channel:
             </p>
-            <ul className="ml-4 list-disc space-y-1 text-muted marker:text-accent">
-              <li><strong className="text-fg">PageRank</strong> — influence / hubs</li>
-              <li><strong className="text-fg">Betweenness</strong> — bridges between communities</li>
-              <li><strong className="text-fg">Louvain clusters</strong> — community detection</li>
+            <ul className="ml-4 list-disc space-y-1 text-white/40 marker:text-indigo-300">
+              <li>
+                <strong className="text-white/80">PageRank</strong> — influence / hubs
+              </li>
+              <li>
+                <strong className="text-white/80">Betweenness</strong> — bridges between communities
+              </li>
+              <li>
+                <strong className="text-white/80">Louvain clusters</strong> — community detection
+              </li>
             </ul>
             <p>
               These power the interactive network visualization on the{" "}
-              <a href="/graph" className="text-accent hover:underline">graph page</a>.
+              <a href="/graph" className="text-indigo-300 hover:underline">
+                graph page
+              </a>.
             </p>
           </Section>
 
           <Section id="scoring" title="Scoring">
             <p>Each channel gets a 0–100 score blending four signals:</p>
             <Code>{`final = quality·40%  +  activity·30%  +  influence·20%  +  freshness·10%`}</Code>
-            <ul className="ml-4 list-disc space-y-1 text-muted marker:text-accent">
-              <li><strong className="text-fg">quality</strong> — LLM usefulness (spam penalized)</li>
-              <li><strong className="text-fg">activity</strong> — volume, images, low repetition</li>
-              <li><strong className="text-fg">influence</strong> — normalized PageRank (network importance)</li>
-              <li><strong className="text-fg">freshness</strong> — recency of the latest post</li>
+            <ul className="ml-4 list-disc space-y-1 text-white/40 marker:text-indigo-300">
+              <li>
+                <strong className="text-white/80">quality</strong> — LLM usefulness (spam penalized)
+              </li>
+              <li>
+                <strong className="text-white/80">activity</strong> — volume, images, low repetition
+              </li>
+              <li>
+                <strong className="text-white/80">influence</strong> — normalized PageRank (network importance)
+              </li>
+              <li>
+                <strong className="text-white/80">freshness</strong> — recency of the latest post
+              </li>
             </ul>
           </Section>
 
@@ -225,7 +253,12 @@ cp .env.prod.example .env.prod   # fill in values
 docker compose --env-file .env.prod up -d --build`}</Code>
             <p>
               Full setup, deployment, and data-migration guides are in the{" "}
-              <a href={REPO} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
+              <a
+                href={REPO}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-indigo-300 hover:underline"
+              >
                 repository
               </a>{" "}
               (README, DOCS, DEPLOY, CONTRIBUTING).
@@ -234,22 +267,23 @@ docker compose --env-file .env.prod up -d --build`}</Code>
 
           <Section id="safety" title="Safety / ToS">
             <p>
-              The crawler is intentionally <strong className="text-fg-bright">read-only and throttled</strong>.
+              The crawler is intentionally{" "}
+              <strong className="text-white">read-only and throttled</strong>.
               It never joins channels, honors Telegram&apos;s rate limits in full,
               and is meant to run on a dedicated, aged account on a residential IP.
             </p>
-            <p className="text-muted">
+            <p className="text-white/40">
               Bans come from behavior (mass-joining, ignoring rate limits), not
               from reading public channels carefully. Keep crawl volume modest.
             </p>
           </Section>
 
-          <div className="border-t border-border pt-6">
+          <div className="border-t border-white/10 pt-6">
             <a
               href={REPO}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-md border border-accent/40 bg-accent/10 px-4 py-2 font-mono text-xs text-accent hover:bg-accent/20"
+              className="inline-flex items-center gap-2 rounded-xl border border-indigo-400/30 bg-indigo-500/10 px-4 py-2 font-mono text-xs text-indigo-300 transition-colors hover:bg-indigo-500/20"
             >
               View on GitHub ↗
             </a>

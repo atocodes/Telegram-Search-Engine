@@ -1,4 +1,4 @@
-# Deploying the read-only demo on a Hetzner VPS
+# Deploying the read-only on a Hetzner VPS
 
 This deploys the **public demo** (frontend + read-only API + Meilisearch +
 Postgres) on a single small server, behind Caddy with automatic HTTPS. The whole

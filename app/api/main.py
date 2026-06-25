@@ -27,7 +27,7 @@ from app.db import analytics
 # the database. There are no write/mutation endpoints. CORS is restricted to the
 # configured frontend origin(s) in production.
 app = FastAPI(
-    title="Telegram Search Engine (read-only demo API)",
+    title="The Under-grounders (read-only API)",
     version="0.1.0",
     docs_url=None if settings.cors_origins else "/docs",  # hide docs in prod
     redoc_url=None,

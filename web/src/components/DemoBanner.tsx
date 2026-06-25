@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 const REPO_URL =
-  process.env.NEXT_PUBLIC_REPO_URL ?? "https://github.com/your/tg-discovery";
+  process.env.NEXT_PUBLIC_REPO_URL ?? "https://github.com/atocodes/Telegram-Search-Engine";
 
 /**
  * Proof-of-concept notice: this deployment explores a frozen dataset the author

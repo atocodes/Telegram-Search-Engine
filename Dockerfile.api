@@ -1,4 +1,4 @@
-# FastAPI (read-only demo API). Build context = repo root.
+# FastAPI (read-only API). Build context = repo root.
 FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1

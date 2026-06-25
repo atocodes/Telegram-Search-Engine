@@ -1,4 +1,4 @@
-# Telegram Search Engine — Documentation
+# The Under-grounders — Documentation
 
 A self-hosted engine that **discovers, analyzes, ranks, and maps** public
 Telegram channels. Use it as a data layer for any app that needs structured

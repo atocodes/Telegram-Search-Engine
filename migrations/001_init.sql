@@ -1,4 +1,4 @@
--- Telegram Search Engine — schema
+-- The Under-grounders — schema
 -- Run against your Supabase Postgres (psql or Supabase SQL editor).
 
 -- ---------------------------------------------------------------------------

@@ -23,21 +23,23 @@ function BigStat({
   sub?: string;
   accent?: "accent" | "warn" | "info" | "danger";
 }) {
-  const color =
-    accent === "warn"
-      ? "text-warn"
-      : accent === "info"
-        ? "text-info"
-        : accent === "danger"
-          ? "text-danger"
-          : "text-accent";
+  const colorMap = {
+    accent: "text-indigo-300",
+    warn: "text-amber-300",
+    info: "text-sky-300",
+    danger: "text-rose-300",
+  };
+  const color = accent ? colorMap[accent] : "text-indigo-300";
+
   return (
-    <div className="panel p-5">
+    <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl p-5">
       <div className="mono-label">{label}</div>
       <div className={`mt-2 font-mono text-3xl font-semibold ${color}`}>
         {value}
       </div>
-      {sub && <div className="mt-1 font-mono text-[11px] text-muted">{sub}</div>}
+      {sub && (
+        <div className="mt-1 font-mono text-[11px] text-white/40">{sub}</div>
+      )}
     </div>
   );
 }
@@ -46,7 +48,7 @@ function Bar({
   label,
   value,
   total,
-  tone = "bg-accent",
+  tone = "bg-indigo-400",
 }: {
   label: string;
   value: number;
@@ -57,10 +59,10 @@ function Bar({
   return (
     <div className="flex items-center gap-3">
       <span className="mono-label w-24 shrink-0 normal-case">{label}</span>
-      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-2">
+      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
         <div className={`h-full ${tone}`} style={{ width: `${pct}%` }} />
       </div>
-      <span className="w-16 shrink-0 text-right font-mono text-xs text-fg">
+      <span className="w-16 shrink-0 text-right font-mono text-xs text-white/80">
         {fmt(value)}
       </span>
     </div>
@@ -78,7 +80,7 @@ export default async function DashboardPage() {
   if (!stats) {
     return (
       <div className="mx-auto max-w-4xl">
-        <h1 className="text-2xl font-semibold text-fg-bright">Dashboard</h1>
+        <h1 className="text-2xl font-semibold text-white">Dashboard</h1>
         <div className="mt-6">
           <EmptyState
             title="backend unavailable"
@@ -101,8 +103,8 @@ export default async function DashboardPage() {
     <div className="mx-auto max-w-4xl">
       <div className="flex items-center justify-between">
         <div>
-          <div className="mb-1 font-mono text-xs text-accent">pipeline</div>
-          <h1 className="text-2xl font-semibold tracking-tight text-fg-bright">
+          <div className="mb-1 font-mono text-xs text-indigo-300">pipeline</div>
+          <h1 className="text-2xl font-semibold tracking-tight text-white">
             Dashboard
           </h1>
         </div>
@@ -136,7 +138,11 @@ export default async function DashboardPage() {
           value={fmt(stats.crawled_24h)}
           accent="accent"
         />
-        <BigStat label="marketplaces" value={fmt(stats.marketplace)} accent="info" />
+        <BigStat
+          label="marketplaces"
+          value={fmt(stats.marketplace)}
+          accent="info"
+        />
         <BigStat
           label="flagged spam"
           value={fmt(stats.spam)}
@@ -146,28 +152,33 @@ export default async function DashboardPage() {
 
       {/* Progress panels */}
       <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <div className="panel p-5">
+        <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl p-5">
           <div className="mono-label mb-3">analysis progress</div>
           <div className="space-y-2">
-            <Bar label="analyzed" value={stats.analyzed} total={analyzeTotal} />
+            <Bar
+              label="analyzed"
+              value={stats.analyzed}
+              total={analyzeTotal}
+              tone="bg-indigo-400"
+            />
             <Bar
               label="pending"
               value={stats.pending_analysis}
               total={analyzeTotal}
-              tone="bg-warn"
+              tone="bg-amber-400"
             />
           </div>
-          <p className="mt-3 font-mono text-[11px] text-muted">
+          <p className="mt-3 font-mono text-[11px] text-white/40">
             {analyzeTotal > 0
               ? `${Math.round((stats.analyzed / analyzeTotal) * 100)}% of channels with messages are analyzed`
               : "no channels with messages yet"}
           </p>
         </div>
 
-        <div className="panel p-5">
+        <div className="rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl p-5">
           <div className="mono-label mb-3">frontier queue</div>
           {frontierTotal === 0 ? (
-            <p className="font-mono text-[11px] text-muted">
+            <p className="font-mono text-[11px] text-white/40">
               {"// empty — run a keyword crawl to seed it"}
             </p>
           ) : (
@@ -176,39 +187,39 @@ export default async function DashboardPage() {
                 label="pending"
                 value={stats.frontier_pending}
                 total={frontierTotal}
-                tone="bg-warn"
+                tone="bg-amber-400"
               />
               <Bar
                 label="done"
                 value={stats.frontier_done}
                 total={frontierTotal}
-                tone="bg-accent"
+                tone="bg-indigo-400"
               />
               <Bar
                 label="failed"
                 value={stats.frontier_failed}
                 total={frontierTotal}
-                tone="bg-danger"
+                tone="bg-rose-400"
               />
               <Bar
                 label="skipped"
                 value={stats.frontier_skipped}
                 total={frontierTotal}
-                tone="bg-border-bright"
+                tone="bg-white/20"
               />
             </div>
           )}
-          <p className="mt-3 font-mono text-[11px] text-muted">
+          <p className="mt-3 font-mono text-[11px] text-white/40">
             {stats.keywords_tracked} keyword queries crawled
           </p>
         </div>
       </div>
 
       {/* Category distribution */}
-      <div className="mt-4 panel p-5">
+      <div className="mt-4 rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl p-5">
         <div className="mono-label mb-3">channels by category</div>
         {stats.categories.length === 0 ? (
-          <p className="font-mono text-[11px] text-muted">
+          <p className="font-mono text-[11px] text-white/40">
             {"// no analyzed channels yet"}
           </p>
         ) : (
@@ -219,7 +230,9 @@ export default async function DashboardPage() {
                 label={categoryLabel(c.category)}
                 value={c.channel_count}
                 total={catTotal}
-                tone={c.category === "spam" ? "bg-danger" : "bg-accent"}
+                tone={
+                  c.category === "spam" ? "bg-rose-400" : "bg-indigo-400"
+                }
               />
             ))}
           </div>
