@@ -6,57 +6,77 @@
 
 :root {
   color-scheme: dark;
-  --font-sans: "Inter";
-  --font-mono: "JetBrains Mono";
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Warm, muted palette */
+  --bg-primary: #121016;
+  --bg-surface: #1d1a24;
+  --text-primary: #e8e4ee;
+  --text-muted: #9f95b4;
+  --accent: #c9a87c;
+  --accent-dim: rgba(201, 168, 124, 0.25);
+  --border-subtle: rgba(255, 255, 255, 0.06);
 }
 
 html,
 body {
-  background: #0a0c10;
-  color: #d7dde6;
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
-/* Subtle grid + scanline texture for the data-tool feel */
+/* Softer texture: diagonal grain + subtle vignette */
 body {
   background-image:
-    linear-gradient(rgba(34, 42, 54, 0.35) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(34, 42, 54, 0.35) 1px, transparent 1px);
-  background-size: 44px 44px;
-  background-position: -1px -1px;
+    radial-gradient(ellipse at 50% 30%, rgba(201, 168, 124, 0.04) 0%, transparent 60%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.012) 2px,
+      rgba(255, 255, 255, 0.012) 4px
+    );
+  background-size: 100% 100%, 6px 6px;
 }
 
 ::selection {
-  background: rgba(61, 220, 151, 0.25);
+  background: var(--accent-dim);
   color: #f2f5f9;
 }
 
-/* Thin custom scrollbar */
+/* Slimmer, lighter scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #2f3a4a transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
 }
 *::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 *::-webkit-scrollbar-thumb {
-  background: #2f3a4a;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.10);
+  border-radius: 8px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.18);
 }
 
 @layer components {
   .panel {
-    /* Use valid Tailwind syntax or extract the opacity into standard CSS variables */
-    @apply rounded-lg border border-border backdrop-blur-sm;
-    background-color: rgb(var(--surface) / 0.8); /* Native CSS alternative */
+    @apply rounded-xl border backdrop-blur-sm;
+    background: rgba(29, 26, 36, 0.75);
+    border-color: var(--border-subtle);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
   }
   .mono-label {
-    @apply font-mono text-[11px] uppercase tracking-[0.18em] text-muted;
+    @apply font-mono text-[10px] uppercase tracking-[0.2em];
+    color: var(--text-muted);
   }
   .focus-ring {
-    @apply outline-none ring-1 ring-transparent;
+    @apply outline-none transition-shadow duration-200;
   }
   .focus-ring:focus-visible {
-    box-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) rgb(var(--accent) / 0.6);
+    box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--accent);
+    border-radius: 4px;
   }
 }
