@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     # Ollama
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "llama3.1:8b"
+    ollama_api_key: str = ""
 
     # Meilisearch
     # If meili_url is empty, search transparently falls back to Postgres FTS.
