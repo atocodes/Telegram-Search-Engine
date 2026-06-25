@@ -1,4 +1,4 @@
-# Telegram Search Engine
+# The Under-grounders
 
 Project Tugs is a fork of [Solo Codes](https://github.com/Brooksolomon)’ brilliant Telegram Search Engine. While the original platform naturally surfaces massive, already famous channels, **Project Tugs is built by underground creators, completely for underground creators.** We modified the core pipeline, scoring architectures, and discovery mechanics to ensure the creators grinding in quiet finally get seen, honored, and supported.
 
