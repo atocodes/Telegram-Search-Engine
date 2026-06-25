@@ -166,7 +166,7 @@ export function TopBar() {
           >
             <div className="absolute inset-0 bg-grid opacity-[0.04]" />
             <Image
-              src="/logo.png"
+              src="/icon.png"
               alt="The Under-grounders Telegram Search Engine"
               width={44}
               height={44}
@@ -205,7 +205,25 @@ export function TopBar() {
               href={l.href}
               className="group relative overflow-hidden rounded-xl px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.18em] text-muted transition-all duration-200 hover:text-fg-bright"
             >
-              <div className="absolute inset-0 rounded-xl border border-accent/20 bg-accent/10 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+              {/* hover background */}
+              <div
+                className="
+                  absolute inset-0
+
+                  rounded-xl
+
+                  border border-accent/20
+
+                  bg-accent/10
+
+                  opacity-0
+
+                  transition-opacity duration-200
+
+                  group-hover:opacity-100
+                "
+              />
+
               <span className="relative z-10">{l.label}</span>
             </Link>
           ))}
