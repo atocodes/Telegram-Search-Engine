@@ -43,6 +43,11 @@ app.add_middleware(
 )
 
 
+@app.get("/")
+def index() -> dict[str, bool]:
+    return {"live": True}
+
+
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
@@ -67,7 +72,8 @@ def channel(channel_id: int) -> ChannelDetail:
     detail.sample_messages = [
         MessageOut(**m, channel_username=row.get("username")) for m in msgs
     ]
-    detail.analytics = ChannelAnalytics(**analytics.channel_analytics(channel_id))
+    detail.analytics = ChannelAnalytics(
+        **analytics.channel_analytics(channel_id))
     return detail
 
 
