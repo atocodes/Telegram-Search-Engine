@@ -75,7 +75,7 @@ export function DocsContent() {
         How it works
       </h1>
       <p className="mt-2 max-w-2xl text-sm text-white/40">
-        The Under-grounders discovers, analyzes, ranks, and maps public
+        The Under-grounders is the alternative version for Telegram Search Built by Solo Codes discovers, analyzes, ranks, and maps public
         Telegram channels. This page covers the design; the full reference lives
         in the{" "}
         <a

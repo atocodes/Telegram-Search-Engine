@@ -12,7 +12,7 @@ import type {
 } from "./types";
 
 const BASE = process.env.FASTAPI_URL ?? "http://localhost:8000";
-
+console.log(BASE)
 class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
@@ -25,6 +25,7 @@ async function get<T>(path: string): Promise<T> {
     headers: { accept: "application/json" },
   });
   if (!res.ok) {
+    console.log(res,"??????????")
     throw new ApiError(res.status, `backend ${res.status} for ${path}`);
   }
   return (await res.json()) as T;

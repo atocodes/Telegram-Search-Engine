@@ -156,6 +156,8 @@ class TelegramReader:
         # Only accept broadcast channels / megagroups, not users or basic groups.
         if not getattr(entity, "broadcast", False) and not getattr(entity, "megagroup", False):
             return None
+        if (value := getattr(entity, "participants_count", None)) is None or value > 1500:
+            return None
         return {
             "tg_id": entity.id,
             "username": getattr(entity, "username", None),

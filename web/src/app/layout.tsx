@@ -4,9 +4,9 @@ import { TopBar } from "@/components/TopBar";
 import { DemoBanner } from "@/components/DemoBanner";
 
 export const metadata: Metadata = {
-  title: "The Under-grounders",
+  title: "TUGS",
   description:
-    "Discover, analyze, and rank public Telegram channels by topic and usefulness.",
+    "A search engine for Telegram that helps you discover public channels, explore creators, and uncover high-quality communities beyond the most popular results.",
 };
 
 export default function RootLayout({

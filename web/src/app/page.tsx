@@ -10,12 +10,12 @@ import type { CategoryOut } from "@/lib/types";
 export const dynamic = "force-dynamic";
 
 const EXAMPLES = [
-  "phones ethiopia",
-  "crypto signals",
-  "addis jobs",
-  "car market",
-  "anime hub",
-  "indie games",
+  "MickyCodes",
+  "pocodes",
+  "nessjourney",
+  "KinesTimeline",
+  "MrChainyParadox",
+  "thechillcodinglounge",
 ];
 
 export default async function HomePage() {
@@ -56,7 +56,6 @@ export default async function HomePage() {
             "
           >
             <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
-
             The Under-grounders · Telegram Discovery Engine
           </div>
 
@@ -72,10 +71,7 @@ export default async function HomePage() {
           >
             Discover the unseen Telegram creators
             <br />
-
-            <span className="text-accent">
-              before they go mainstream.
-            </span>
+            <span className="text-accent">before they go mainstream.</span>
           </h1>
 
           {/* Description */}
@@ -86,8 +82,9 @@ export default async function HomePage() {
               sm:text-lg
             "
           >
-            We scan public Telegram channels to surface underrated creators, niche communities,
-            and emerging voices. Ranked by real activity, consistency, and content quality — not hype.
+            We scan public Telegram channels to surface underrated creators,
+            niche communities, and emerging voices. Ranked by real activity,
+            consistency, and content quality — not hype.
           </p>
 
           {/* Search */}
@@ -144,14 +141,14 @@ export default async function HomePage() {
             <div className="font-mono text-[11px] uppercase tracking-widest text-muted">
               Focus
             </div>
-            
+
             <div className="mt-3 text-2xl font-semibold text-fg-bright">
               Under 1.5K
             </div>
 
             <p className="mt-2 text-sm leading-6 text-muted">
-              Built specifically for smaller Telegram
-              communities and emerging creators.
+              Built specifically for smaller Telegram communities and emerging
+              creators.
             </p>
           </div>
 
@@ -171,8 +168,8 @@ export default async function HomePage() {
             </div>
 
             <p className="mt-2 text-sm leading-6 text-muted">
-              Channels ranked using engagement,
-              freshness, quality, and network activity.
+              Channels ranked using engagement, freshness, quality, and network
+              activity.
             </p>
           </div>
 
@@ -192,8 +189,8 @@ export default async function HomePage() {
             </div>
 
             <p className="mt-2 text-sm leading-6 text-muted">
-              No spam directories. No inflated channels.
-              Just active communities that matter.
+              No spam directories. No inflated channels. Just active communities
+              that matter.
             </p>
           </div>
         </div>
@@ -237,8 +234,7 @@ export default async function HomePage() {
             >
               <div className="font-mono text-xs text-danger">
                 // backend offline — start FastAPI on{" "}
-                {process.env.FASTAPI_URL ??
-                  "http://localhost:8000"}
+                {process.env.FASTAPI_URL ?? "http://localhost:8000"}
               </div>
             </div>
           ) : categories.length === 0 ? (
@@ -250,8 +246,7 @@ export default async function HomePage() {
               "
             >
               <div className="font-mono text-xs text-muted">
-                // no analyzed channels yet —
-                run crawler + analyzer
+                // no analyzed channels yet — run crawler + analyzer
               </div>
             </div>
           ) : (
