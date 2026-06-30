@@ -228,12 +228,12 @@ export function TopBar() {
             </Link>
           ))}
           <div className="mx-2 h-5 w-px bg-border" />
-          <StarButton />
+          {/* <StarButton /> */}
         </nav>
 
         {/* MOBILE */}
         <div className="flex items-center gap-2 md:hidden">
-          <StarButton />
+          {/* <StarButton /> */}
           <button
             onClick={() => setOpen((o) => !o)}
             aria-label="Toggle menu"
